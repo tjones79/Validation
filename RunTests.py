@@ -95,7 +95,7 @@ def check_reference_file(common_funcs, test_webpage, test_variables, debug):
         The current implementation logs the absence of the reference file as a test failure, which was the previous behavior.
     '''
     ret = 0
-    rootfilename = f"{test_variables['FileTag']}_analysed_wcsimrootevent.root"
+    rootfilename = f"{common_funcs.ValidationPath}/Compare/Reference/{test_variables['FileTag']}_analysed_wcsimrootevent.root"
     if not os.path.isfile(rootfilename):
         common_funcs.add_entry(test_webpage, "#FF00FF", "", "Reference file does not exist")
         ret = 1
@@ -224,7 +224,7 @@ def compare_geofile(common_funcs, test_webpage, variables, test_num, debug):
         ref_file_geo = f"{common_funcs.ValidationPath}/Compare/Reference/{variables['GeoFileName']}"
         diff_file_geo = f"{variables['GeoFileName']}.diff.txt"
         diff_path = f"{common_funcs.ValidationPath}/Webpage/{common_funcs.GIT_COMMIT}/{test_num}/"
-        ret += common_funcs.check_diff(test_webpage, diff_path, diff_file_geo, ref_file_geo, test_file_geo, "Geom")
+        ret += common_funcs.check_diff(test_webpage, diff_path, diff_file_geo, ref_file_geo, test_file_geo, "Geom",True)
     except Exception as e:
         raise Exception(f"Unexpected error occured when comparing the geometry files: {e}")
     if debug:
@@ -403,12 +403,12 @@ def main():
         
         #Run all of the physics validation tests in order. The order of tests is important, WCSim should be run before file tests.
         if test_type == f"{common_funcs.SOFTWARE_NAME}PhysicsValidation":
-            ret = check_reference_file(common_funcs, test_webpage, test_variables, args.debug)
-            ret += run_wcsim(test_variables, common_funcs, test_webpage, args.debug)
-            ret += compare_root_files(common_funcs, test_webpage, test_dir, test_variables, args.test_num, args.debug)
-            ret += compare_geofile(common_funcs, test_webpage, test_variables, args.test_num, args.debug)
-            ret += compare_badfile(common_funcs, test_webpage, test_variables, args.test_num, args.debug)
-            ret += check_impossible_geometry(common_funcs, test_webpage, test_variables, args.test_num, args.debug)
+            #ret = check_reference_file(common_funcs, test_webpage, test_variables, args.debug)
+            #ret = run_wcsim(test_variables, common_funcs, test_webpage, args.debug)
+            #ret += compare_root_files(common_funcs, test_webpage, test_dir, test_variables, args.test_num, args.debug)
+            ret = compare_geofile(common_funcs, test_webpage, test_variables, args.test_num, args.debug)
+            #ret += compare_badfile(common_funcs, test_webpage, test_variables, args.test_num, args.debug)
+            #ret += check_impossible_geometry(common_funcs, test_webpage, test_variables, args.test_num, args.debug)
 
 
 

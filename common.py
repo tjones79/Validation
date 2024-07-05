@@ -156,7 +156,7 @@ class CommonWebPageFuncs:
             # Setup the commit
             self.logger.info("Adding")
             self.run_command("git add --all")
-            self.run_command(f"git commit -a -m CI update: new pages for {self.GIT_COMMIT}")
+            self.run_command(f'git commit -a -m "CI update: new pages for {self.GIT_COMMIT}"')
 
             # Setup a loop to prevent clashes when multiple jobs change the webpage at the same time
             for iattempt in range(self.MAX_PUSH_ATTEMPTS):
@@ -167,6 +167,7 @@ class CommonWebPageFuncs:
                 push_command = f"git push https://{self.GIT_USER}:{self.GIT_TOKEN}@{self.VALIDATION_GIT_PATH} {self.WEBPAGE_BRANCH}"
                 print(push_command)
                 push_process = self.run_command(push_command)
+                #push_process = subprocess.run(push_command,shell=True)
 
                 if push_process.returncode == 0:
                     break
@@ -204,7 +205,7 @@ class CommonWebPageFuncs:
         except Exception as e:
             self.logger.error(f"An unexpected error has occured in add_entry in common functions: {e}")
             
-    def check_diff(self, TESTWEBPAGE, diff_path, diff_file, ref_file, test_file, file_type):
+    def check_diff(self, TESTWEBPAGE, diff_path, diff_file, ref_file, test_file, file_type, debug=False):
         """
         Function to compare differences between reference and test files and update a test webpage accordingly.
 
@@ -219,6 +220,7 @@ class CommonWebPageFuncs:
         - ref_file: The file path of the reference file.
         - test_file: The file path of the test file.
         - file_type: The type of file being compared.
+        - debug: debugging tag, default value of false.
 
         Returns:
         - 1 if differences are found between the files.
@@ -231,13 +233,18 @@ class CommonWebPageFuncs:
         try:
             diffEntryAdded = False
             #Check if the reference file and test file exist
+            if(debug):
+                self.logger.info(f"Comparing {ref_file} to {test_file}")
+
             if not os.path.isfile(f"{ref_file}"):
                 self.add_entry(TESTWEBPAGE, "#FF00FF", "", f"Reference {file_type} not found")
                 diffEntryAdded = True
+                if(debug): self.logger.info("Reference file has not been found!")
                 return 1
             if not os.path.isfile(f"{test_file}"):
-                self.add_entry(TESTWEBPAGE, "#FF00FF", "", f"Reference {file_type} not found")
+                self.add_entry(TESTWEBPAGE, "#FF00FF", "", f"Test {file_type} not found")
                 diffEntryAdded = True
+                if(debug): self.logger.info("Test file has not been found!")
                 return 1
 
 
